@@ -4,9 +4,11 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 
 import { Exclude } from 'class-transformer';
+import { Transaction } from '@modules/transactions/infra/typeorm/entities/Transaction';
 
 @Entity('users')
 export class User {
@@ -25,6 +27,11 @@ export class User {
   @Column()
   @Exclude()
   password: string;
+
+  @OneToMany(() => Transaction, transaction => transaction.user, {
+    cascade: true,
+  })
+  transactions: Transaction[];
 
   @CreateDateColumn()
   created_at: Date;

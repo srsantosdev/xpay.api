@@ -4,4 +4,5 @@ export type ICreateTransactionDTO = {
   category: string;
   amount: number;
   date: Date;
+  user_id: string;
 };
