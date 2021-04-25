@@ -45,6 +45,14 @@ export class TransactionsRepository implements ITransactionsRepository {
     return transactions;
   }
 
+  public async filterByDate(date: Date): Promise<Transaction[]> {
+    const transactions = this.ormRepository.find({
+      where: { date },
+    });
+
+    return transactions;
+  }
+
   public async filterByDateAndUser(
     date: Date,
     user_id: string,

@@ -1,4 +1,5 @@
 import { v4 as uuid } from 'uuid';
+import { set as setDate, isEqual } from 'date-fns';
 
 import { Transaction } from '@modules/transactions/infra/typeorm/entities/Transaction';
 import { ICreateTransactionDTO } from '@modules/transactions/dtos/ICreateTransactionDTO';
@@ -17,12 +18,19 @@ export class FakeTransactionsRepository implements ITransactionsRepository {
   }: ICreateTransactionDTO): Promise<Transaction> {
     const transaction = new Transaction();
 
+    const resetDateConfig = {
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+      miliseconds: 0,
+    };
+
     Object.assign(transaction, {
       id: uuid(),
       description,
       category,
       amount,
-      date,
+      date: setDate(date, resetDateConfig),
       type,
       user_id,
     });
@@ -35,6 +43,14 @@ export class FakeTransactionsRepository implements ITransactionsRepository {
   public async findById(id: string): Promise<Transaction | undefined> {
     const findTransaction = this.transactions.find(
       transaction => transaction.id === id,
+    );
+
+    return findTransaction;
+  }
+
+  public async filterByDate(date: Date): Promise<Transaction[]> {
+    const findTransaction = this.transactions.filter(transaction =>
+      isEqual(transaction.date, date),
     );
 
     return findTransaction;
@@ -54,7 +70,7 @@ export class FakeTransactionsRepository implements ITransactionsRepository {
   ): Promise<Transaction[]> {
     const transactions = this.transactions
       .filter(transaction => transaction.user_id === user_id)
-      .filter(transaction => transaction.date === date);
+      .filter(transaction => isEqual(transaction.date, date));
 
     return transactions;
   }
