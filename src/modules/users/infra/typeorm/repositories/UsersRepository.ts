@@ -1,11 +1,16 @@
-import { getRepository } from 'typeorm';
+import { getRepository, Repository } from 'typeorm';
 
 import { ICreateUserDTO } from '@modules/users/dtos/ICreateUserDTO';
 import { IUsersRepository } from '@modules/users/repositories/IUsersRepository';
+
 import { User } from '../entities/User';
 
 export class UsersRepository implements IUsersRepository {
-  constructor(private ormRepository = getRepository(User)) {}
+  private ormRepository: Repository<User>;
+
+  constructor() {
+    this.ormRepository = getRepository(User);
+  }
 
   public async create({
     document,

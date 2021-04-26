@@ -1,11 +1,15 @@
-import { getRepository } from 'typeorm';
+import { getRepository, Repository } from 'typeorm';
 
 import { Transaction } from '@modules/transactions/infra/typeorm/entities/Transaction';
 import { ICreateTransactionDTO } from '@modules/transactions/dtos/ICreateTransactionDTO';
 import { ITransactionsRepository } from '@modules/transactions/repositories/ITransactionsRepository';
 
 export class TransactionsRepository implements ITransactionsRepository {
-  constructor(private ormRepository = getRepository(Transaction)) {}
+  private ormRepository: Repository<Transaction>;
+
+  constructor() {
+    this.ormRepository = getRepository(Transaction);
+  }
 
   public async create({
     description,

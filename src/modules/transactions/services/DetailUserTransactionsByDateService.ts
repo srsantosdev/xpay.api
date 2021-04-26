@@ -1,5 +1,5 @@
 import { inject, injectable } from 'tsyringe';
-import { set as setDate, isEqual } from 'date-fns';
+import { set as setDate, isEqual, isAfter, isBefore } from 'date-fns';
 
 import AppError from '@shared/errors/AppError';
 
@@ -77,6 +77,18 @@ export class DetailUserTransactionsByDateService {
       }),
     );
 
-    return transactionsByDate;
+    const sortTransactionsByDate = transactionsByDate.sort((a, b) => {
+      if (isAfter(a.date, b.date)) {
+        return -1;
+      }
+
+      if (isBefore(a.date, b.date)) {
+        return 1;
+      }
+
+      return 0;
+    });
+
+    return sortTransactionsByDate;
   }
 }

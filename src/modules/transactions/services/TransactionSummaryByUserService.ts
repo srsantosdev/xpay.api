@@ -1,5 +1,5 @@
 import { inject, injectable } from 'tsyringe';
-import { set as setDate, isEqual } from 'date-fns';
+import { set as setDate, isEqual, isAfter, isBefore } from 'date-fns';
 
 import AppError from '@shared/errors/AppError';
 
@@ -43,7 +43,19 @@ export class TransactionSummaryByUserService {
       miliseconds: 0,
     };
 
-    const dates = transactions.map(transaction => transaction.date);
+    const dates = transactions
+      .map(transaction => transaction.date)
+      .sort((a: any, b: any) => {
+        if (a > b) {
+          return 1;
+        }
+
+        if (a < b) {
+          return -1;
+        }
+
+        return 0;
+      });
     const nonDuplicateDates: Date[] = [];
 
     dates.forEach(date => {
@@ -57,6 +69,7 @@ export class TransactionSummaryByUserService {
     });
 
     const transactionsSummary: TransactionSummary[] = [];
+    const calculatedValues: number[] = [];
 
     await Promise.all(
       nonDuplicateDates.map(async date => {
@@ -65,13 +78,22 @@ export class TransactionSummaryByUserService {
           user.id,
         );
 
-        const totalTransactions = transactionsOnDate.reduce(
+        const totalTransactionsOnDate = transactionsOnDate.reduce(
           (accumulator, transaction) => {
             if (transaction.type === 'income') {
-              return accumulator + transaction.amount;
+              return accumulator + Number(transaction.amount);
             }
 
-            return accumulator - transaction.amount;
+            return accumulator - Number(transaction.amount);
+          },
+          0,
+        );
+
+        calculatedValues.push(totalTransactionsOnDate);
+
+        const totalTransactions = calculatedValues.reduce(
+          (accumulator, total) => {
+            return accumulator + total;
           },
           0,
         );
@@ -87,6 +109,18 @@ export class TransactionSummaryByUserService {
       }),
     );
 
-    return transactionsSummary;
+    const sortTransactionsSummary = transactionsSummary.sort((a, b) => {
+      if (isBefore(a.date, b.date)) {
+        return -1;
+      }
+
+      if (isAfter(a.date, b.date)) {
+        return 1;
+      }
+
+      return 0;
+    });
+
+    return sortTransactionsSummary;
   }
 }
