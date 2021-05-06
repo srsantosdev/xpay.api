@@ -83,7 +83,7 @@ describe('Transaction Summary By User', () => {
         },
         {
           date: setDate(new Date(2021, 3, 22), resetDateConfig),
-          total: 1300,
+          total: 1897,
         },
       ]),
     );

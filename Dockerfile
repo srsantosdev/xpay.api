@@ -8,6 +8,7 @@ RUN yarn
 COPY . .
 
 RUN yarn build
+RUN yarn typeorm migration:run
 
 EXPOSE 3333
 
